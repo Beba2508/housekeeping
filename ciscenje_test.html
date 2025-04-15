@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Raspored Čišćenja</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #fff0f5;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    #statusCircle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #f4aaaa;
+      cursor: pointer;
+      border: 2px solid #ccc;
+      margin: 1rem auto 0 auto;
+      display: none;
+    }
+
+    #selectedApartment {
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    #statusText {
+      margin-top: 1rem;
+      font-size: 1rem;
+      font-style: italic;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Današnji raspored čišćenja. Odaberi apartman:</h2>
+
+  <select id="apartmentSelect">
+    <option value="">-- Odaberi apartman --</option>
+    <option value="ZS2">ZS2</option>
+    <option value="ZS1">ZS1</option>
+    <option value="ZI1">ZI1</option>
+    <option value="ZJ2">ZJ2</option>
+  </select>
+
+  <div id="selectedApartment"></div>
+  <div id="statusCircle" title="Klikni za promjenu statusa"></div>
+  <div id="statusText"></div>
+
+  <script>
+    const apartmentSelect = document.getElementById('apartmentSelect');
+    const statusCircle = document.getElementById('statusCircle');
+    const selectedApartmentDiv = document.getElementById('selectedApartment');
+    const statusText = document.getElementById('statusText');
+
+    const statusData = [
+      { color: '#f4aaaa', text: '🟥 nije očišćen' },
+      { color: '#ffe29a', text: '🟨 čišćenje u tijeku' },
+      { color: '#b4f0a7', text: '🟩 spreman za check in' }
+    ];
+
+    let apartmentStatuses = {};  // Store status for each apartment
+    let currentStatus = 0;
+    let currentApartment = '';
+
+    apartmentSelect.addEventListener('change', () => {
+      const selected = apartmentSelect.value;
+      currentApartment = selected;
+
+      if (selected) {
+        selectedApartmentDiv.textContent = `Odabrani apartman: ${selected}`;
+
+        // If we have saved status, load it; otherwise, set to 0
+        if (apartmentStatuses[selected] !== undefined) {
+          currentStatus = apartmentStatuses[selected];
+        } else {
+          currentStatus = 0;
+        }
+
+        updateStatusCircle();
+        statusCircle.style.display = 'block';
+      } else {
+        selectedApartmentDiv.textContent = '';
+        statusCircle.style.display = 'none';
+        statusText.textContent = '';
+      }
+    });
+
+    statusCircle.addEventListener('click', () => {
+      currentStatus = (currentStatus + 1) % 3;
+      apartmentStatuses[currentApartment] = currentStatus; // Save status
+      updateStatusCircle();
+    });
+
+    function updateStatusCircle() {
+      statusCircle.style.backgroundColor = statusData[currentStatus].color;
+      statusText.textContent = statusData[currentStatus].text;
+    }
+  </script>
+
+</body>
+</html>
